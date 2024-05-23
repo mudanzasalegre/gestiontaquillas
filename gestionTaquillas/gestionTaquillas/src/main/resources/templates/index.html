@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Gestión de Taquillas</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .action-icons {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .action-icons a {
+            color: white;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+        .action-icons .edit {
+            background-color: #28a745;
+        }
+
+        .action-icons .delete {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><a href="/" class="text-decoration-none text-dark">Gestión de Taquillas</a></h1>
+
+        <!-- Mostrar mensaje de éxito -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <form action="/buscar" method="get" class="form-inline my-3">
+            <div class="form-group mr-2">
+                <label for="nombre" class="mr-2">Buscar por nombre:</label>
+                <input type="text" id="nombre" name="nombre" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        <h2>Listado de Taquillas</h2>
+        <div class="row mb-3">
+            <div class="form-group col-md-4">
+                <label for="vestuario">Filtrar por vestuario:</label>
+                <select id="vestuario" name="vestuario" class="form-control" onchange="location = this.value;">
+                    <option th:value="@{/}" th:selected="${selectedVestuario == 'Todos'}">Todos</option>
+                    <option th:value="@{/vestuario(vestuario='A', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'A'}">A</option>
+                    <option th:value="@{/vestuario(vestuario='B', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'B'}">B</option>
+                    <option th:value="@{/vestuario(vestuario='C', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'C'}">C</option>
+                    <option th:value="@{/vestuario(vestuario='D', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'D'}">D</option>
+                    <option th:value="@{/vestuario(vestuario='E', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'E'}">E</option>
+                    <option th:value="@{/vestuario(vestuario='F', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'F'}">F</option>
+                    <option th:value="@{/vestuario(vestuario='G', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'G'}">G</option>
+                    <option th:value="@{/vestuario(vestuario='H', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'H'}">H</option>
+                    <option th:value="@{/vestuario(vestuario='I', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'I'}">I</option>
+                    <option th:value="@{/vestuario(vestuario='J', sexo=${selectedSexo})}" th:selected="${selectedVestuario == 'J'}">J</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="sexo">Filtrar por sexo:</label>
+                <select id="sexo" name="sexo" class="form-control" onchange="location = this.value;">
+                    <option th:value="@{/}" th:selected="${selectedSexo == 'Todos'}">Todos</option>
+                    <option th:value="@{/sexo(sexo='M', vestuario=${selectedVestuario})}" th:selected="${selectedSexo == 'M'}">M</option>
+                    <option th:value="@{/sexo(sexo='F', vestuario=${selectedVestuario})}" th:selected="${selectedSexo == 'F'}">F</option>
+                    <option th:value="@{/sexo(sexo='O', vestuario=${selectedVestuario})}" th:selected="${selectedSexo == 'O'}">O</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="pageSize">Mostrar:</label>
+                <select id="pageSize" name="pageSize" class="form-control" onchange="location = this.value;">
+                    <option th:value="@{/(page=0, size=10, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}"
+                        th:selected="${pageSize == 10}">10</option>
+                    <option th:value="@{/(page=0, size=25, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}"
+                        th:selected="${pageSize == 25}">25</option>
+                    <option th:value="@{/(page=0, size=50, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}"
+                        th:selected="${pageSize == 50}">50</option>
+                </select>
+            </div>
+        </div>
+        <div class="text-right mb-3">
+            <a href="/taquilla/nueva" class="btn btn-primary">Agregar Taquilla</a>
+        </div>
+
+        <!-- Encabezados de tabla con enlaces de ordenación -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=id&sortDirection=${reverseSortDirection}|}">ID</a></th>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=vestuario&sortDirection=${reverseSortDirection}|}">Vestuario</a></th>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=sexo&sortDirection=${reverseSortDirection}|}">Sexo</a></th>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=codigoTaquilla&sortDirection=${reverseSortDirection}|}">Código Taquilla</a></th>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=nombreApellidos&sortDirection=${reverseSortDirection}|}">Nombre y Apellidos</a></th>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=categoriaProfesional&sortDirection=${reverseSortDirection}|}">Categoría Profesional</a></th>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=servicio&sortDirection=${reverseSortDirection}|}">Servicio</a></th>
+                    <th><a th:href="@{|/?page=${currentPage}&size=${pageSize}&vestuario=${selectedVestuario}&sexo=${selectedSexo}&sortField=telefono&sortDirection=${reverseSortDirection}|}">Teléfono</a></th>
+                    <th>Empresa Externa</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="taquilla : ${taquillas}">
+                    <td th:text="${taquilla.id}"></td>
+                    <td th:text="${taquilla.vestuario}"></td>
+                    <td th:text="${taquilla.sexo}"></td>
+                    <td th:text="${taquilla.codigoTaquilla}"></td>
+                    <td th:text="${taquilla.nombreApellidos}"></td>
+                    <td th:text="${taquilla.categoriaProfesional}"></td>
+                    <td th:text="${taquilla.servicio}"></td>
+                    <td th:text="${taquilla.telefono}"></td>
+                    <td th:text="${taquilla.empresaExterna ? 'Sí' : 'No'}"></td>
+                    <td>
+                        <div class="action-icons">
+                            <a th:href="@{/taquilla/editar/{id}(id=${taquilla.id})}" class="edit" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{/taquilla/eliminar/{id}(id=${taquilla.id})}" class="delete" title="Eliminar" th:onclick="return confirm('¿Estás seguro de que deseas eliminar esta taquilla?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/(page=${currentPage - 1}, size=${pageSize}, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:if="${currentPage > 2}">
+                    <a class="page-link" th:href="@{/(page=0, size=${pageSize}, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}">1</a>
+                </li>
+                <li class="page-item" th:if="${currentPage > 3}">
+                    <span class="page-link">...</span>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 0, currentPage + 2 < totalPages ? currentPage + 2 : totalPages - 1)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/(page=${i}, size=${pageSize}, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}"
+                        th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:if="${currentPage + 3 < totalPages}">
+                    <span class="page-link">...</span>
+                </li>
+                <li class="page-item" th:if="${currentPage + 2 < totalPages}">
+                    <a class="page-link" th:href="@{/(page=${totalPages - 1}, size=${pageSize}, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}"
+                        th:text="${totalPages}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{/(page=${currentPage + 1}, size=${pageSize}, vestuario=${selectedVestuario}, sexo=${selectedSexo}, sortField=${sortField}, sortDirection=${sortDirection})}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

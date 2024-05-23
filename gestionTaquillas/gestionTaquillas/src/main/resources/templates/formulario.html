@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Formulario de Taquilla</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 th:text="${editMode} ? 'Editar Taquilla' : 'Nueva Taquilla'">Nueva Taquilla</h1>
+        
+        <!-- Mostrar mensaje de error -->
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        
+        <form action="/taquilla/guardar" method="post" th:object="${taquilla}">
+            <input type="hidden" th:if="${taquilla.id != null}" th:field="*{id}">
+            <div class="form-group">
+                <label for="vestuario">Vestuario</label>
+                <input type="text" class="form-control" id="vestuario" name="vestuario" th:field="*{vestuario}" required>
+            </div>
+            <div class="form-group">
+                <label>Sexo</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="sexoM" name="sexo" value="M" th:field="*{sexo}">
+                    <label class="form-check-label" for="sexoM">M</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="sexoF" name="sexo" value="F" th:field="*{sexo}">
+                    <label class="form-check-label" for="sexoF">F</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="sexoO" name="sexo" value="O" th:field="*{sexo}">
+                    <label class="form-check-label" for="sexoO">O</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="codigoTaquilla">Código Taquilla</label>
+                <input type="text" class="form-control" id="codigoTaquilla" name="codigoTaquilla" th:field="*{codigoTaquilla}" required>
+            </div>
+            <div class="form-group">
+                <label for="nombreApellidos">Nombre y Apellidos</label>
+                <input type="text" class="form-control" id="nombreApellidos" name="nombreApellidos" th:field="*{nombreApellidos}" th:disabled="${editMode}" required>
+            </div>
+            <div class="form-group">
+                <label for="categoriaProfesional">Categoría Profesional</label>
+                <input type="text" class="form-control" id="categoriaProfesional" name="categoriaProfesional" th:field="*{categoriaProfesional}" required>
+            </div>
+            <div class="form-group">
+                <label for="servicio">Servicio</label>
+                <input type="text" class="form-control" id="servicio" name="servicio" th:field="*{servicio}" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" th:field="*{telefono}">
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="empresaExterna" name="empresaExterna" th:field="*{empresaExterna}">
+                <label class="form-check-label" for="empresaExterna">Empresa Externa</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
