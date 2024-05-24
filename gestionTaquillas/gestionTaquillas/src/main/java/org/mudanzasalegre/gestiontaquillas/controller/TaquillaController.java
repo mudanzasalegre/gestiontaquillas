@@ -168,14 +168,34 @@ public class TaquillaController {
     public String guardarTaquilla(@ModelAttribute Taquilla taquilla, Model model, RedirectAttributes redirectAttributes) {
         try {
             boolean isEdit = (taquilla.getId() != null);
+
+            if (isEdit) {
+                Taquilla existingTaquilla = taquillaService.getTaquillaById(taquilla.getId());
+                if (existingTaquilla != null && !existingTaquilla.getCodigoTaquilla().equals(taquilla.getCodigoTaquilla())) {
+                    model.addAttribute("errorMessage", "El código de taquilla no se puede cambiar.");
+                    return "formulario";
+                }
+            }
+
             taquillaService.guardar(taquilla);
             String successMessage = isEdit ? "Taquilla editada con éxito" : "Taquilla creada con éxito";
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
-            return "redirect:/"; // Redirigir a la página principal u otra página después de guardar
+            return "redirect:/";
         } catch (DataIntegrityViolationException e) {
             model.addAttribute("errorMessage", "El código de taquilla ya está en uso. Por favor, elige otro.");
-            return "formulario"; // Volver al formulario si hay un error
+            return "formulario";
         }
+    }
+
+    @GetMapping("/taquilla/eliminar/{id}")
+    public String eliminarTaquilla(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        try {
+            taquillaService.eliminar(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Taquilla eliminada con éxito");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al eliminar la taquilla");
+        }
+        return "redirect:/";
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
