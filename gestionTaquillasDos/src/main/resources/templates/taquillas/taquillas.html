@@ -1,168 +1,191 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>Gestión de Taquillas</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+	<title>Gestión de Taquillas</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
-    <div th:insert="~{fragments/navbar :: navbar}"></div>
-    <div class="container">
-        <h1 class="my-4">Gestión de Taquillas</h1>
-        
-        <div th:if="${successMessage}" class="alert alert-success" role="alert">
-            <span th:text="${successMessage}"></span>
-        </div>
-        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
-            <span th:text="${errorMessage}"></span>
-        </div>
+	<div th:insert="~{fragments/navbar :: navbar}"></div>
+	<div class="container">
+		<h1 class="my-4">Gestión de Taquillas</h1>
 
-        <form id="searchForm" th:action="@{/taquillas}" method="get" class="form-inline mb-4" onsubmit="return validateSearchForm()">
-            <div class="form-group mr-2">
-                <label for="nombreApellidos" class="mr-2">Buscar por Nombre y Apellidos:</label>
-                <input type="text" id="nombreApellidos" name="nombreApellidos" th:value="${nombreApellidos}" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-primary">Buscar</button>
-            <div id="error-message" class="text-danger ml-3" style="display: none;">Por favor, introduzca un nombre y apellidos para buscar.</div>
-        </form>
+		<a href="/taquillas/new" class="btn btn-primary my-3">Nueva Taquilla</a>
 
-        <div class="form-inline mb-4">
-            <div class="form-group mr-2">
-                <label for="vestuarioFilter" class="mr-2">Filtrar por Vestuario:</label>
-                <select id="vestuarioFilter" name="vestuarioId" class="form-control" onchange="filterByVestuario(this.value)">
-                    <option value="" th:selected="${vestuarioId == ''}">Todos</option>
-                    <option th:each="vestuario : ${vestuarios}" th:value="${vestuario.id}" th:text="${vestuario.nombre}" th:selected="${vestuario.id.toString() == vestuarioId}"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="pageSize" class="mr-2">Mostrar:</label>
-                <select id="pageSize" class="form-control" onchange="updatePageSize(this.value)">
-                    <option value="10" th:selected="${taquillas.size == 10}">10</option>
-                    <option value="25" th:selected="${taquillas.size == 25}">25</option>
-                    <option value="50" th:selected="${taquillas.size == 50}">50</option>
-                </select>
-            </div>
-        </div>
 
-        <h2 th:text="'Taquillas en: ' + ${vestuarioNombre}"></h2>
+		<div th:if="${successMessage}" class="alert alert-success" role="alert">
+			<span th:text="${successMessage}"></span>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+			<span th:text="${errorMessage}"></span>
+		</div>
 
-        <div th:if="${noResults}">
-            <p class="text-center">No se encontraron resultados.</p>
-        </div>
+		<form id="searchForm" th:action="@{/taquillas}" method="get" class="form-inline mb-4"
+			onsubmit="return validateSearchForm()">
+			<div class="form-group mr-2">
+				<label for="nombreApellidos" class="mr-2">Buscar por Nombre y Apellidos:</label>
+				<input type="text" id="nombreApellidos" name="nombreApellidos" th:value="${nombreApellidos}"
+					class="form-control">
+			</div>
+			<button type="submit" class="btn btn-primary">Buscar</button>
+			<div id="error-message" class="text-danger ml-3" style="display: none;">Por favor, introduzca un nombre y
+				apellidos para buscar.</div>
+		</form>
 
-        <table class="table table-bordered" th:if="${!noResults}">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nombre y Apellidos</th>
-                    <th>Categoria Profesional</th>
-                    <th>Servicio</th>
-                    <th>Teléfono</th>
-                    <th>Empresa Externa</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="taquilla : ${taquillas}">
-                    <td th:text="${taquilla.codigoTaquilla}"></td>
-                    <td th:text="${taquilla.nombreApellidos}"></td>
-                    <td th:text="${taquilla.categoriaProfesional}"></td>
-                    <td th:text="${taquilla.servicio}"></td>
-                    <td th:text="${taquilla.telefono}"></td>
-                    <td th:text="${taquilla.empresaExterna ? 'Sí' : 'No'}"></td>
-                    <td>
-                        <a th:href="@{/taquillas/edit/{id}(id=${taquilla.id})}" class="btn btn-info btn-sm">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button class="btn btn-danger btn-sm" th:onclick="'confirmDelete(' + ${taquilla.id} + ')'">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+		<div class="form-inline mb-4">
+			<div class="form-group mr-2">
+				<label for="vestuarioFilter" class="mr-2">Filtrar por Vestuario:</label>
+				<select id="vestuarioFilter" name="vestuarioId" class="form-control"
+					onchange="filterByVestuario(this.value)">
+					<option value="" th:selected="${vestuarioId == ''}">Todos</option>
+					<option th:each="vestuario : ${vestuarios}" th:value="${vestuario.id}" th:text="${vestuario.nombre}"
+						th:selected="${vestuario.id.toString() == vestuarioId}"></option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="pageSize" class="mr-2">Mostrar:</label>
+				<select id="pageSize" class="form-control" onchange="updatePageSize(this.value)">
+					<option value="10" th:selected="${taquillas.size == 10}">10</option>
+					<option value="25" th:selected="${taquillas.size == 25}">25</option>
+					<option value="50" th:selected="${taquillas.size == 50}">50</option>
+				</select>
+			</div>
+		</div>
 
-        <nav aria-label="Page navigation" th:if="${!noResults}">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${taquillas.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/taquillas(page=${taquillas.number - 1}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item" th:if="${taquillas.number > 2}">
-                    <a class="page-link" th:href="@{/taquillas(page=0, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}">1</a>
-                </li>
-                <li class="page-item" th:if="${taquillas.number > 3}">
-                    <span class="page-link">...</span>
-                </li>
-                <li class="page-item" th:each="i : ${#numbers.sequence(0, taquillas.totalPages - 1)}" th:if="${i >= taquillas.number - 2} and ${i <= taquillas.number + 2}" th:classappend="${i} == ${taquillas.number} ? 'active'">
-                    <a class="page-link" th:href="@{/taquillas(page=${i}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}" th:text="${i + 1}">1</a>
-                </li>
-                <li class="page-item" th:if="${taquillas.number + 3 < taquillas.totalPages}">
-                    <span class="page-link">...</span>
-                </li>
-                <li class="page-item" th:if="${taquillas.number + 2 < taquillas.totalPages}">
-                    <a class="page-link" th:href="@{/taquillas(page=${taquillas.totalPages - 1}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}" th:text="${taquillas.totalPages}">1</a>
-                </li>
-                <li class="page-item" th:classappend="${taquillas.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/taquillas(page=${taquillas.number + 1}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-    <div th:insert="~{fragments/footer :: footer}"></div>
+		<h2 th:text="'Taquillas en: ' + ${vestuarioNombre}"></h2>
 
-    <!-- Modal de confirmación -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar esta taquilla?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <a id="deleteButton" href="#" class="btn btn-danger">Eliminar</a>
-                </div>
-            </div>
-        </div>
-    </div>
+		<div th:if="${noResults}">
+			<p class="text-center">No se encontraron resultados.</p>
+		</div>
 
-    <script>
-        function validateSearchForm() {
-            var nombreApellidos = document.getElementById("nombreApellidos").value;
-            if (!nombreApellidos.trim()) {
-                document.getElementById("error-message").style.display = "block";
-                return false;
-            }
-            return true;
-        }
+		<table class="table table-bordered" th:if="${!noResults}">
+			<thead>
+				<tr>
+					<th>Código</th>
+					<th>Nombre y Apellidos</th>
+					<th>Categoria Profesional</th>
+					<th>Servicio</th>
+					<th>Teléfono</th>
+					<th>Empresa Externa</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="taquilla : ${taquillas}">
+					<td th:text="${taquilla.codigoTaquilla}"></td>
+					<td th:text="${taquilla.nombreApellidos}"></td>
+					<td th:text="${taquilla.categoriaProfesional}"></td>
+					<td th:text="${taquilla.servicio}"></td>
+					<td th:text="${taquilla.telefono}"></td>
+					<td th:text="${taquilla.empresaExterna ? 'Sí' : 'No'}"></td>
+					<td>
+						<a th:href="@{/taquillas/edit/{id}(id=${taquilla.id})}" class="btn btn-info btn-sm">
+							<i class="fas fa-edit"></i>
+						</a>
+						<button class="btn btn-danger btn-sm" th:onclick="'confirmDelete(' + ${taquilla.id} + ')'">
+							<i class="fas fa-trash-alt"></i>
+						</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 
-        function updatePageSize(size) {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set('size', size);
-            window.location.search = searchParams.toString();
-        }
+		<nav aria-label="Page navigation" th:if="${!noResults}">
+			<ul class="pagination justify-content-center">
+				<li class="page-item" th:classappend="${taquillas.first} ? 'disabled'">
+					<a class="page-link"
+						th:href="@{/taquillas(page=${taquillas.number - 1}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}"
+						aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+					</a>
+				</li>
+				<li class="page-item" th:if="${taquillas.number > 2}">
+					<a class="page-link"
+						th:href="@{/taquillas(page=0, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}">1</a>
+				</li>
+				<li class="page-item" th:if="${taquillas.number > 3}">
+					<span class="page-link">...</span>
+				</li>
+				<li class="page-item" th:each="i : ${#numbers.sequence(0, taquillas.totalPages - 1)}"
+					th:if="${i >= taquillas.number - 2} and ${i <= taquillas.number + 2}"
+					th:classappend="${i} == ${taquillas.number} ? 'active'">
+					<a class="page-link"
+						th:href="@{/taquillas(page=${i}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}"
+						th:text="${i + 1}">1</a>
+				</li>
+				<li class="page-item" th:if="${taquillas.number + 3 < taquillas.totalPages}">
+					<span class="page-link">...</span>
+				</li>
+				<li class="page-item" th:if="${taquillas.number + 2 < taquillas.totalPages}">
+					<a class="page-link"
+						th:href="@{/taquillas(page=${taquillas.totalPages - 1}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}"
+						th:text="${taquillas.totalPages}">1</a>
+				</li>
+				<li class="page-item" th:classappend="${taquillas.last} ? 'disabled'">
+					<a class="page-link"
+						th:href="@{/taquillas(page=${taquillas.number + 1}, size=${taquillas.size}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos})}"
+						aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+					</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+	<div th:insert="~{fragments/footer :: footer}"></div>
 
-        function filterByVestuario(vestuarioId) {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set('vestuarioId', vestuarioId);
-            searchParams.set('nombreApellidos', document.getElementById("nombreApellidos").value);
-            window.location.search = searchParams.toString();
-        }
+	<!-- Modal de confirmación -->
+	<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog"
+		aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					¿Está seguro de que desea eliminar esta taquilla?
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<a id="deleteButton" href="#" class="btn btn-danger">Eliminar</a>
+				</div>
+			</div>
+		</div>
+	</div>
 
-        function confirmDelete(id) {
-            var deleteUrl = '/taquillas/delete/' + id;
-            document.getElementById('deleteButton').setAttribute('href', deleteUrl);
-            $('#confirmDeleteModal').modal('show');
-        }
-    </script>
+	<script>
+		function validateSearchForm() {
+			var nombreApellidos = document.getElementById("nombreApellidos").value;
+			if (!nombreApellidos.trim()) {
+				document.getElementById("error-message").style.display = "block";
+				return false;
+			}
+			return true;
+		}
+
+		function updatePageSize(size) {
+			var searchParams = new URLSearchParams(window.location.search);
+			searchParams.set('size', size);
+			window.location.search = searchParams.toString();
+		}
+
+		function filterByVestuario(vestuarioId) {
+			var searchParams = new URLSearchParams(window.location.search);
+			searchParams.set('vestuarioId', vestuarioId);
+			searchParams.set('nombreApellidos', document.getElementById("nombreApellidos").value);
+			window.location.search = searchParams.toString();
+		}
+
+		function confirmDelete(id) {
+			var deleteUrl = '/taquillas/delete/' + id;
+			document.getElementById('deleteButton').setAttribute('href', deleteUrl);
+			$('#confirmDeleteModal').modal('show');
+		}
+	</script>
 </body>
+
 </html>

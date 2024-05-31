@@ -11,12 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -71,8 +66,6 @@ public class TaquillaController {
         return "taquillas/taquillas";
     }
 
-
-
     @GetMapping("/search")
     public String searchTaquillas(@RequestParam("nombreApellidos") String nombreApellidos,
                                   @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model) {
@@ -93,7 +86,7 @@ public class TaquillaController {
     }
 
     @PostMapping
-    public String saveTaquilla(@ModelAttribute Taquilla taquilla, Model model) {
+    public String saveTaquilla(@ModelAttribute Taquilla taquilla, Model model, RedirectAttributes redirectAttributes) {
         Taquilla existingTaquilla = taquillaService.findByCodigoTaquilla(taquilla.getCodigoTaquilla());
         boolean isNew = (taquilla.getId() == null);
 
@@ -107,7 +100,7 @@ public class TaquillaController {
 
         try {
             taquillaService.save(taquilla);
-            model.addAttribute("successMessage", "Taquilla guardada correctamente.");
+            redirectAttributes.addFlashAttribute("successMessage", "Taquilla guardada correctamente.");
         } catch (DataIntegrityViolationException e) {
             model.addAttribute("errorMessage", "Error al guardar la taquilla. Verifique los datos e intente nuevamente.");
             model.addAttribute("taquilla", taquilla);
@@ -117,7 +110,6 @@ public class TaquillaController {
         }
         return "redirect:/taquillas";
     }
-
 
     @GetMapping("/edit/{id}")
     public String editTaquilla(@PathVariable Integer id, Model model) {
@@ -134,7 +126,7 @@ public class TaquillaController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteTaquilla(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
+    public String deleteTaquilla(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
             taquillaService.deleteById(id);
             redirectAttributes.addFlashAttribute("successMessage", "Taquilla eliminada correctamente.");
@@ -143,5 +135,4 @@ public class TaquillaController {
         }
         return "redirect:/taquillas";
     }
-
 }
