@@ -1,0 +1,67 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestión de Taquillas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .hero-section {
+            background-color: #f8f9fa;
+            padding: 50px 0;
+        }
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 300;
+        }
+        .hero-section p {
+            font-size: 1.25rem;
+            color: #6c757d;
+        }
+        .card {
+            margin-top: 30px;
+        }
+        .card-title {
+            font-size: 1.5rem;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <div class="hero-section text-center">
+        <div class="container">
+            <h1>Bienvenido a la Gestión de Taquillas</h1>
+            <p>Una plataforma sencilla y eficiente para gestionar taquillas y vestuarios.</p>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Gestión de Taquillas</h5>
+                        <p class="card-text">Administre y supervise las taquillas de forma eficiente. Puede agregar, editar y eliminar taquillas según sea necesario.</p>
+                        <a href="/taquillas" class="btn btn-primary">Ir a Taquillas</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Gestión de Vestuarios</h5>
+                        <p class="card-text">Gestione los vestuarios disponibles. Puede agregar, editar y eliminar vestuarios para mantener el sistema actualizado.</p>
+                        <a href="/vestuarios" class="btn btn-primary">Ir a Vestuarios</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>

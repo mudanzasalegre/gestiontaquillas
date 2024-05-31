@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Gestión de Vestuarios</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    <div class="container">
+        <h1 class="my-4">Gestión de Vestuarios</h1>
+
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <a href="/vestuarios/new" class="btn btn-primary my-3">Nuevo Vestuario</a>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        <a th:href="@{/vestuarios(sortField='nombre', sortDir=${reverseSortDir})}">
+                            Nombre 
+                            <i class="fas" th:classappend="${sortField == 'nombre'} ? (${sortDir == 'asc'} ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up') : 'fa-sort'"></i>
+                        </a>
+                    </th>
+                    <th>Sexo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="vestuario : ${vestuarios}">
+                    <td th:text="${vestuario.nombre}"></td>
+                    <td th:text="${vestuario.sexo.descripcion}"></td>
+                    <td>
+                        <a th:href="@{/vestuarios/edit/{id}(id=${vestuario.id})}" class="btn btn-info btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn btn-danger btn-sm" th:onclick="'confirmDelete(' + ${vestuario.id} + ')'">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar este vestuario?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <a id="deleteButton" href="#" class="btn btn-danger">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete(id) {
+            var deleteUrl = '/vestuarios/delete/' + id;
+            document.getElementById('deleteButton').setAttribute('href', deleteUrl);
+            $('#confirmDeleteModal').modal('show');
+        }
+    </script>
+</body>
+
+</html>
