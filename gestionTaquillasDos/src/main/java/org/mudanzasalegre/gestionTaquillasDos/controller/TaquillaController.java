@@ -11,8 +11,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/taquillas")
@@ -85,8 +93,15 @@ public class TaquillaController {
         return "taquillas/newTaquilla";
     }
 
+
     @PostMapping
-    public String saveTaquilla(@ModelAttribute Taquilla taquilla, Model model, RedirectAttributes redirectAttributes) {
+    public String saveTaquilla(@ModelAttribute @Valid Taquilla taquilla, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            model.addAttribute("vestuarios", vestuarioService.findAll());
+            model.addAttribute("action", taquilla.getId() == null ? "Crear" : "Editar");
+            return "taquillas/newTaquilla";
+        }
+
         Taquilla existingTaquilla = taquillaService.findByCodigoTaquilla(taquilla.getCodigoTaquilla());
         boolean isNew = (taquilla.getId() == null);
 
@@ -110,6 +125,7 @@ public class TaquillaController {
         }
         return "redirect:/taquillas";
     }
+
 
     @GetMapping("/edit/{id}")
     public String editTaquilla(@PathVariable Integer id, Model model) {

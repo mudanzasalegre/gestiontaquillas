@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <title th:text="${action} + ' Taquilla'">Nueva Taquilla</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-</head>
+    <script>
+        function validatePhoneNumber(input) {
+            const phoneNumber = input.value;
+            const phoneRegex = /^\d{0,9}$/;
 
+            if (!phoneRegex.test(phoneNumber)) {
+                input.setCustomValidity("El número de teléfono debe tener 9 dígitos.");
+            } else {
+                input.setCustomValidity("");
+            }
+        }
+    </script>
+</head>
 <body>
     <div th:replace="~{fragments/navbar :: navbar}"></div>
     <div class="container">
@@ -35,18 +45,22 @@
             <div class="form-group">
                 <label for="nombreApellidos">Nombre y Apellidos:</label>
                 <input type="text" id="nombreApellidos" th:field="*{nombreApellidos}" class="form-control">
+                <div class="text-danger" th:if="${#fields.hasErrors('nombreApellidos')}" th:errors="*{nombreApellidos}">Nombre y Apellidos Error</div>
             </div>
             <div class="form-group">
                 <label for="categoriaProfesional">Categoría Profesional:</label>
                 <input type="text" id="categoriaProfesional" th:field="*{categoriaProfesional}" class="form-control">
+                <div class="text-danger" th:if="${#fields.hasErrors('categoriaProfesional')}" th:errors="*{categoriaProfesional}">Categoría Profesional Error</div>
             </div>
             <div class="form-group">
                 <label for="servicio">Servicio:</label>
                 <input type="text" id="servicio" th:field="*{servicio}" class="form-control">
+                <div class="text-danger" th:if="${#fields.hasErrors('servicio')}" th:errors="*{servicio}">Servicio Error</div>
             </div>
             <div class="form-group">
                 <label for="telefono">Teléfono:</label>
-                <input type="text" id="telefono" th:field="*{telefono}" class="form-control">
+                <input type="text" id="telefono" th:field="*{telefono}" class="form-control" oninput="validatePhoneNumber(this)">
+                <div class="text-danger" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}">Teléfono Error</div>
             </div>
             <div class="form-group">
                 <label for="empresaExterna">Empresa Externa:</label>
@@ -58,5 +72,4 @@
     </div>
     <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
-
 </html>
