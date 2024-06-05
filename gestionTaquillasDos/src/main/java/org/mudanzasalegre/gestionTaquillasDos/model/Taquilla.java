@@ -23,9 +23,19 @@
 
 package org.mudanzasalegre.gestionTaquillasDos.model;
 
-import jakarta.validation.constraints.Pattern;
 import java.util.Objects;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "taquillas", indexes = { @Index(name = "idx_taquilla_codigo", columnList = "codigoTaquilla") })
@@ -39,16 +49,17 @@ public class Taquilla {
 	@JoinColumn(name = "vestuario_id", nullable = false)
 	private Vestuario vestuario;
 
+ @NotBlank(message = "El código de taquilla es obligatorio.")
 	@Column(nullable = false, unique = true, length = 20)
 	private String codigoTaquilla;
 
-	@Column(nullable = false, length = 255)
+	@Column(length = 255)
 	private String nombreApellidos;
 
-	@Column(nullable = false, length = 50)
+	@Column(length = 50)
 	private String categoriaProfesional;
 
-	@Column(nullable = false, length = 50)
+	@Column(length = 50)
 	private String servicio;
 
 	@Pattern(regexp = "^\\d{9}$|^$", message = "El número de teléfono debe tener 9 dígitos o estar en blanco")
