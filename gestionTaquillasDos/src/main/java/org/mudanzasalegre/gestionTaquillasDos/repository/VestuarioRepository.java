@@ -23,6 +23,8 @@
 
 package org.mudanzasalegre.gestionTaquillasDos.repository;
 
+import java.util.List;
+
 import org.mudanzasalegre.gestionTaquillasDos.model.Vestuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -30,4 +32,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VestuarioRepository extends JpaRepository<Vestuario, Integer> {
 	Vestuario findByNombre(String nombre);
+ List<Vestuario> findAllByOrderByNombreAsc();
+
 }

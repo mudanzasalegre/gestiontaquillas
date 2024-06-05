@@ -39,9 +39,9 @@ public class VestuarioService {
     private VestuarioRepository vestuarioRepository;
 
     public List<Vestuario> findAll() {
-        return vestuarioRepository.findAll();
+        return vestuarioRepository.findAllByOrderByNombreAsc();
     }
-    
+
     public List<Vestuario> findAll(Sort sort) {
         return vestuarioRepository.findAll(sort);
     }
@@ -58,8 +58,8 @@ public class VestuarioService {
         Optional<Vestuario> vestuario = vestuarioRepository.findById(id);
         return vestuario.orElse(null);
     }
-    
+
     public Vestuario findByNombre(String nombre) {
-     return vestuarioRepository.findByNombre(nombre);
- }
+        return vestuarioRepository.findByNombre(nombre);
+    }
 }
