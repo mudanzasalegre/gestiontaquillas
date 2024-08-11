@@ -35,6 +35,8 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "taquillas", indexes = { @Index(name = "idx_taquilla_codigo", columnList = "codigoTaquilla") })
@@ -49,6 +51,7 @@ public class Taquilla {
 	private Vestuario vestuario;
 
 	@Column(name = "codigo_taquilla", nullable = false, unique = true, length = 50)
+	@NotBlank(message = "El código de taquilla es obligatorio.")
 	private String codigoTaquilla;
 
 	@Column(name = "nombre_apellidos", length = 255)
@@ -61,6 +64,7 @@ public class Taquilla {
 	private String servicio;
 
 	@Column(name = "telefono", length = 9)
+ @Pattern(regexp = "^\\d{9}$|^$", message = "El teléfono debe tener 9 dígitos o estar vacío.")
 	private String telefono;
 
 	@Column(name = "empresa_externa")
