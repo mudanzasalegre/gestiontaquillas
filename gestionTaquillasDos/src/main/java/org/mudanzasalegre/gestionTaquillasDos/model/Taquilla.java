@@ -23,6 +23,7 @@
 
 package org.mudanzasalegre.gestionTaquillasDos.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -34,8 +35,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "taquillas", indexes = { @Index(name = "idx_taquilla_codigo", columnList = "codigoTaquilla") })
@@ -49,32 +48,37 @@ public class Taquilla {
 	@JoinColumn(name = "vestuario_id", nullable = false)
 	private Vestuario vestuario;
 
- @NotBlank(message = "El código de taquilla es obligatorio.")
-	@Column(nullable = false, unique = true, length = 20)
+	@Column(name = "codigo_taquilla", nullable = false, unique = true, length = 50)
 	private String codigoTaquilla;
 
-	@Column(length = 255)
+	@Column(name = "nombre_apellidos", length = 255)
 	private String nombreApellidos;
 
-	@Column(length = 50)
+	@Column(name = "categoria_profesional", length = 30)
 	private String categoriaProfesional;
 
-	@Column(length = 50)
+	@Column(name = "servicio", length = 30)
 	private String servicio;
 
-	@Pattern(regexp = "^\\d{9}$|^$", message = "El número de teléfono debe tener 9 dígitos o estar en blanco")
-	@Column(length = 9)
+	@Column(name = "telefono", length = 9)
 	private String telefono;
 
-	private boolean empresaExterna;
+	@Column(name = "empresa_externa")
+	private Boolean empresaExterna;
+
+	@Column(name = "fecha_revision")
+	private LocalDateTime fechaRevision;
+
+	@Column(name = "revisado", nullable = false)
+	private Boolean revisado = false;
 
 	// Constructor vacío
 	public Taquilla() {
 	}
 
-	// Constructor con parámetros
+	// Constructor parametrizado
 	public Taquilla(Vestuario vestuario, String codigoTaquilla, String nombreApellidos, String categoriaProfesional,
-			String servicio, String telefono, boolean empresaExterna) {
+			String servicio, String telefono, Boolean empresaExterna, LocalDateTime fechaRevision, Boolean revisado) {
 		this.vestuario = vestuario;
 		this.codigoTaquilla = codigoTaquilla;
 		this.nombreApellidos = nombreApellidos;
@@ -82,7 +86,11 @@ public class Taquilla {
 		this.servicio = servicio;
 		this.telefono = telefono;
 		this.empresaExterna = empresaExterna;
+		this.fechaRevision = fechaRevision;
+		this.revisado = revisado;
 	}
+
+	// Getters y Setters
 
 	public Integer getId() {
 		return id;
@@ -140,40 +148,61 @@ public class Taquilla {
 		this.telefono = telefono;
 	}
 
-	public boolean isEmpresaExterna() {
+	public Boolean getEmpresaExterna() {
 		return empresaExterna;
 	}
 
-	public void setEmpresaExterna(boolean empresaExterna) {
+	public void setEmpresaExterna(Boolean empresaExterna) {
 		this.empresaExterna = empresaExterna;
 	}
 
+	public LocalDateTime getFechaRevision() {
+		return fechaRevision;
+	}
+
+	public void setFechaRevision(LocalDateTime fechaRevision) {
+		this.fechaRevision = fechaRevision;
+	}
+
+	public Boolean getRevisado() {
+		return revisado;
+	}
+
+	public void setRevisado(Boolean revisado) {
+		this.revisado = revisado;
+	}
+
+	// Método toString
+
 	@Override
 	public String toString() {
-		return "Taquilla [id=" + id + ", vestuario=" + vestuario + ", codigoTaquilla=" + codigoTaquilla + ", nombreApellidos="
-				+ nombreApellidos + ", categoriaProfesional=" + categoriaProfesional + ", servicio=" + servicio + ", telefono="
-				+ telefono + ", empresaExterna=" + empresaExterna + "]";
+		return "Taquilla{" + "id=" + id + ", vestuario=" + vestuario + ", codigoTaquilla='" + codigoTaquilla + '\''
+				+ ", nombreApellidos='" + nombreApellidos + '\'' + ", categoriaProfesional='" + categoriaProfesional + '\''
+				+ ", servicio='" + servicio + '\'' + ", telefono='" + telefono + '\'' + ", empresaExterna=" + empresaExterna
+				+ ", fechaRevision=" + fechaRevision + ", revisado=" + revisado + '}';
+	}
+
+	// Métodos equals y hashCode
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Taquilla taquilla = (Taquilla) o;
+		return Objects.equals(id, taquilla.id) && Objects.equals(vestuario, taquilla.vestuario)
+				&& Objects.equals(codigoTaquilla, taquilla.codigoTaquilla)
+				&& Objects.equals(nombreApellidos, taquilla.nombreApellidos)
+				&& Objects.equals(categoriaProfesional, taquilla.categoriaProfesional)
+				&& Objects.equals(servicio, taquilla.servicio) && Objects.equals(telefono, taquilla.telefono)
+				&& Objects.equals(empresaExterna, taquilla.empresaExterna) && Objects.equals(fechaRevision, taquilla.fechaRevision)
+				&& Objects.equals(revisado, taquilla.revisado);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(categoriaProfesional, codigoTaquilla, empresaExterna, id, nombreApellidos, servicio, telefono,
-				vestuario);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Taquilla other = (Taquilla) obj;
-		return Objects.equals(categoriaProfesional, other.categoriaProfesional)
-				&& Objects.equals(codigoTaquilla, other.codigoTaquilla) && empresaExterna == other.empresaExterna
-				&& Objects.equals(id, other.id) && Objects.equals(nombreApellidos, other.nombreApellidos)
-				&& Objects.equals(servicio, other.servicio) && Objects.equals(telefono, other.telefono)
-				&& Objects.equals(vestuario, other.vestuario);
+		return Objects.hash(id, vestuario, codigoTaquilla, nombreApellidos, categoriaProfesional, servicio, telefono,
+				empresaExterna, fechaRevision, revisado);
 	}
 }

@@ -1,0 +1,41 @@
+<!-- templates/error.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error - Gestión de Taquillas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .error-section {
+            background-color: #f8f9fa;
+            padding: 50px 0;
+            text-align: center;
+        }
+        .error-section h1 {
+            font-size: 4rem;
+            font-weight: 300;
+            color: #dc3545;
+        }
+        .error-section p {
+            font-size: 1.25rem;
+            color: #6c757d;
+        }
+        .error-section a {
+            margin-top: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <div class="error-section">
+        <div class="container">
+            <h1 th:text="${status}">Error</h1>
+            <p th:text="'Lo sentimos, ocurrió un error. Código de error: ' + ${status}"></p>
+            <a href="/" class="btn btn-primary">Volver al Inicio</a>
+        </div>
+    </div>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>

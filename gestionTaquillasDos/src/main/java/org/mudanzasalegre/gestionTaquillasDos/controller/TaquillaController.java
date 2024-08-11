@@ -1,26 +1,8 @@
-/*
- * Gestión de Taquillas App - Propiedad Intelectual
- * Derechos de autor (c) - 2024 - mudanzasalegre
- * 
- * Este software y la documentación asociada son propiedad de JL Alegre (el "Autor").
- * 
- * Permiso de uso:
- * Se concede permiso para usar este software y la documentación asociada para fines internos dentro de [Nombre de la Institución] únicamente.
- * 
- * Restricciones:
- * 1. No se permite la copia, modificación, distribución, venta, sublicencia o transferencia de este software sin el permiso expreso y por escrito del Autor.
- * 2. Este software no puede ser usado para fines comerciales sin el consentimiento previo por escrito del Autor.
- * 
- * Propiedad Intelectual:
- * Este software es y seguirá siendo propiedad intelectual del Autor.
- * 
- * Garantía y Responsabilidad:
- * Este software se proporciona "tal cual", sin garantía de ningún tipo, expresa o implícita, incluyendo pero no limitándose a las garantías de comerciabilidad, idoneidad para un propósito particular y no infracción. En ningún caso el Autor será responsable por cualquier reclamo, daño o responsabilidad, ya sea en una acción de contrato, agravio o de otro tipo, que surja de o en conexión con el software o el uso u otros tratos en el software.
- * 
- * Contacto:
- * Para solicitar permiso o información adicional, por favor contacta a mudanzasalegre@hotmail.com
- */
 package org.mudanzasalegre.gestionTaquillasDos.controller;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.mudanzasalegre.gestionTaquillasDos.model.Taquilla;
 import org.mudanzasalegre.gestionTaquillasDos.model.Vestuario;
@@ -57,7 +39,7 @@ public class TaquillaController {
 
 	@GetMapping
 	public String listTaquillas(Model model, @RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "nombreApellidos") String sortField,
+			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "codigoTaquilla") String sortField,
 			@RequestParam(defaultValue = "asc") String sortDir, @RequestParam(defaultValue = "") String vestuarioId,
 			@RequestParam(defaultValue = "") String nombreApellidos) {
 		Sort sort = Sort.by(sortDir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortField);
@@ -99,7 +81,6 @@ public class TaquillaController {
 		model.addAttribute("nombreApellidos", nombreApellidos);
 		model.addAttribute("noResults", noResults);
 
-		// Add pagination range
 		int currentPage = taquillasPage.getNumber() + 1;
 		int startPage = Math.max(1, currentPage - 2);
 		int endPage = Math.min(totalPages, currentPage + 2);
@@ -176,6 +157,27 @@ public class TaquillaController {
 		}
 	}
 
+	@PostMapping("/updateRevision/{id}")
+	public String updateRevision(@PathVariable Integer id, @RequestParam(required = false) String fechaRevision,
+			RedirectAttributes redirectAttributes) {
+		Taquilla taquilla = taquillaService.findById(id);
+
+		if (taquilla != null) {
+			if (fechaRevision == null || fechaRevision.isEmpty()) {
+				taquilla.setFechaRevision(null);
+			} else {
+				LocalDateTime revisionDate = LocalDateTime.parse(fechaRevision, DateTimeFormatter.ISO_DATE_TIME);
+				taquilla.setFechaRevision(revisionDate);
+			}
+			taquillaService.save(taquilla);
+			redirectAttributes.addFlashAttribute("successMessage", "Fecha de revisión actualizada correctamente.");
+		} else {
+			redirectAttributes.addFlashAttribute("errorMessage", "Taquilla no encontrada.");
+		}
+
+		return "redirect:/taquillas/edit/" + id;
+	}
+
 	@GetMapping("/delete/{id}")
 	public String deleteTaquilla(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
 		try {
@@ -187,4 +189,63 @@ public class TaquillaController {
 		}
 		return "redirect:/taquillas";
 	}
+
+	// batch issues
+	@GetMapping("/batchManagement")
+	public String batchManagement(Model model, @RequestParam(defaultValue = "codigoTaquilla") String sortField,
+			@RequestParam(defaultValue = "asc") String sortDir, @RequestParam(defaultValue = "") String vestuarioId) {
+
+		Sort sort = Sort.by(sortDir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortField);
+		List<Taquilla> taquillas;
+
+		if (!vestuarioId.isEmpty()) {
+			// Filtrar por vestuario
+			taquillas = taquillaService.findByVestuarioId(Integer.parseInt(vestuarioId), sort);
+		} else {
+			// Mostrar todas las taquillas
+			taquillas = taquillaService.findAll(sort);
+		}
+
+		model.addAttribute("taquillas", taquillas);
+		model.addAttribute("vestuarios", vestuarioService.findAll());
+		model.addAttribute("sortField", sortField);
+		model.addAttribute("sortDir", sortDir);
+		model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+		model.addAttribute("vestuarioId", vestuarioId);
+
+		return "taquillas/batchManagement";
+	}
+
+	@PostMapping("/batchUpdate")
+	public String batchUpdate(@RequestParam("taquillaIds") List<Integer> taquillaIds,
+			@RequestParam(required = false) String fechaRevision, @RequestParam(required = false) Boolean checkRevisado,
+			@RequestParam(required = false) Boolean uncheckRevisado, @RequestParam(required = false) Boolean clearRevision,
+			RedirectAttributes redirectAttributes) {
+
+		LocalDateTime revisionDate = null;
+		if (fechaRevision != null && !fechaRevision.isEmpty()) {
+			revisionDate = LocalDateTime.parse(fechaRevision, DateTimeFormatter.ISO_DATE_TIME);
+		}
+
+		for (Integer id : taquillaIds) {
+			Taquilla taquilla = taquillaService.findById(id);
+			if (taquilla != null) {
+				if (clearRevision != null && clearRevision) {
+					taquilla.setFechaRevision(null);
+				} else if (revisionDate != null) {
+					taquilla.setFechaRevision(revisionDate);
+				}
+				if (checkRevisado != null && checkRevisado) {
+					taquilla.setRevisado(true);
+				} else if (uncheckRevisado != null && uncheckRevisado) {
+					taquilla.setRevisado(false);
+				}
+				taquillaService.save(taquilla);
+			}
+		}
+
+		redirectAttributes.addFlashAttribute("successMessage", "Taquillas actualizadas correctamente.");
+		return "redirect:/taquillas/batchManagement";
+	}
+
 }

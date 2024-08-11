@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Gestión de Taquillas - Batch</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script>
+    // Mover la función selectAllTaquillas fuera de document.addEventListener
+    function selectAllTaquillas(source) {
+        const checkboxes = document.querySelectorAll('input[name="taquillaIds"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Funciones para la manipulación de la fecha de revisión
+        function setFechaRevision() {
+            const now = new Date();
+            const formattedDate = now.toISOString().slice(0, 19);
+            const fechaRevisionInput = document.getElementById('batchFechaRevisionInput');
+            if (fechaRevisionInput) {
+                fechaRevisionInput.value = formattedDate;
+            }
+        }
+
+        function clearFechaRevision() {
+            const fechaRevisionInput = document.getElementById('batchFechaRevisionInput');
+            if (fechaRevisionInput) {
+                fechaRevisionInput.value = '';
+            }
+        }
+
+        // Función para filtrar por vestuario
+        function filterByVestuario() {
+            const vestuarioId = document.getElementById("vestuarioFilter");
+            if (vestuarioId) {
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('vestuarioId', vestuarioId.value);
+                searchParams.set('page', 0); // Reiniciar a la primera página al cambiar el vestuario
+                window.location.search = searchParams.toString();
+            }
+        }
+
+        // Función para controlar la lógica de los checkboxes
+        function toggleCheckboxes() {
+            const checkRevisado = document.getElementById("batchCheckRevisado");
+            const uncheckRevisado = document.getElementById("batchUncheckRevisado");
+
+            // No permitir que ambos checkboxes estén seleccionados al mismo tiempo
+            if (checkRevisado && uncheckRevisado) {
+                if (checkRevisado.checked && uncheckRevisado.checked) {
+                    alert("No puedes seleccionar ambos: 'Check Revisado' y 'Uncheck Revisado' a la vez.");
+                    checkRevisado.checked = false;
+                    uncheckRevisado.checked = false;
+                }
+            }
+        }
+
+        // Asignar el evento de clic al botón de filtrar
+        const filterButton = document.getElementById("filterButton");
+        if (filterButton) {
+            filterButton.addEventListener("click", filterByVestuario);
+        }
+
+        // Asignar las funciones de set y clear a los botones correspondientes
+        const setFechaRevisionButton = document.getElementById("setFechaRevisionButton");
+        if (setFechaRevisionButton) {
+            setFechaRevisionButton.addEventListener("click", setFechaRevision);
+        }
+
+        const clearFechaRevisionButton = document.getElementById("clearFechaRevisionButton");
+        if (clearFechaRevisionButton) {
+            clearFechaRevisionButton.addEventListener("click", clearFechaRevision);
+        }
+
+        // Asignar la función de validación a los checkboxes
+        const checkRevisado = document.getElementById("batchCheckRevisado");
+        if (checkRevisado) {
+            checkRevisado.addEventListener("change", toggleCheckboxes);
+        }
+
+        const uncheckRevisado = document.getElementById("batchUncheckRevisado");
+        if (uncheckRevisado) {
+            uncheckRevisado.addEventListener("change", toggleCheckboxes);
+        }
+    });
+</script>
+
+</head>
+
+<body>
+	<div th:replace="~{fragments/navbar :: navbar}"></div>
+	<div class="container">
+		<h1 class="my-4">Gestión de Taquillas en Batch</h1>
+
+		<!-- Mensajes de éxito o error -->
+		<div th:if="${successMessage}" class="alert alert-success" role="alert">
+			<span th:text="${successMessage}"></span>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+			<span th:text="${errorMessage}"></span>
+		</div>
+
+		<!-- Filtro por Vestuario -->
+		<div class="form-inline mb-4">
+			<div class="form-group mr-2">
+				<label for="vestuarioFilter" class="mr-2">Filtrar por Vestuario:</label>
+				<select id="vestuarioFilter" name="vestuarioId" class="form-control">
+					<option value="" th:selected="${vestuarioId == ''}">Todos</option>
+					<option th:each="vestuario : ${vestuarios}" th:value="${vestuario.id}" th:text="${vestuario.nombre}"
+						th:selected="${vestuario.id.toString() == vestuarioId}"></option>
+				</select>
+			</div>
+			<!-- Botón de Filtrar -->
+			<button id="filterButton" type="button" class="btn btn-primary">Filtrar</button>
+		</div>
+
+		<!-- Formulario para la gestión batch -->
+		<form th:action="@{/taquillas/batchUpdate}" method="post">
+			<div class="d-flex justify-content-center">
+				<div class="w-50">
+					<div class="form-group">
+						<label for="batchFechaRevision">Fecha de Última Revisión para las seleccionadas:</label>
+						<div class="input-group">
+							<input type="text" id="batchFechaRevisionInput" name="fechaRevision" class="form-control"
+								readonly>
+							<div class="input-group-append">
+								<button id="setFechaRevisionButton" type="button" class="btn btn-primary ml-2">Marcar
+									Revisión</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<!-- Checkboxes alineados en la misma línea -->
+			<div class="form-inline mb-2">
+				<div class="form-group mr-4">
+					<label for="batchCheckRevisado" class="mr-2">Check Revisado:</label>
+					<input type="checkbox" id="batchCheckRevisado" name="checkRevisado">
+				</div>
+				<div class="form-group mr-4">
+					<label for="batchUncheckRevisado" class="mr-2">Uncheck Revisado:</label>
+					<input type="checkbox" id="batchUncheckRevisado" name="uncheckRevisado">
+				</div>
+				<div class="form-group">
+					<label for="batchClearRevision" class="mr-2">Borrar Última Revisión:</label>
+					<input type="checkbox" id="batchClearRevision" name="clearRevision">
+				</div>
+			</div>
+
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th><input type="checkbox" onclick="selectAllTaquillas(this)"></th>
+						<th>
+							<a
+								th:href="@{/taquillas/batchManagement(sortField='codigoTaquilla', sortDir=${reverseSortDir}, vestuarioId=${vestuarioId})}">
+								Código Taquilla
+								<i class="fas"
+									th:classappend="${sortField == 'codigoTaquilla'} ? (${sortDir == 'asc'} ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up') : 'fa-sort'"></i>
+							</a>
+						</th>
+						<th>Nombre y Apellidos</th>
+						<th>Categoría Profesional</th>
+						<th>Servicio</th>
+						<th>Última Revisión</th>
+						<th>Revisado</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="taquilla : ${taquillas}">
+						<td><input type="checkbox" name="taquillaIds" th:value="${taquilla.id}"></td>
+						<td th:text="${taquilla.codigoTaquilla}"></td>
+						<td th:text="${taquilla.nombreApellidos}"></td>
+						<td th:text="${taquilla.categoriaProfesional}"></td>
+						<td th:text="${taquilla.servicio}"></td>
+						<td
+							th:text="${taquilla.fechaRevision != null ? #temporals.format(taquilla.fechaRevision, 'dd/MM/yyyy HH:mm') : 'Sin revisión'}">
+						</td>
+						<td><input type="checkbox" th:checked="${taquilla.revisado}" disabled></td>
+					</tr>
+					<tr th:if="${taquillas.empty}">
+						<td colspan="7" class="text-center">No se encontraron taquillas para el vestuario seleccionado.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<button type="submit" class="btn btn-primary">Actualizar Seleccionadas</button>
+			<a href="/taquillas" class="btn btn-secondary">Cancelar</a>
+		</form>
+	</div>
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

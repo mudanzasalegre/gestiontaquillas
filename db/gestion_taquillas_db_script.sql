@@ -16,5 +16,7 @@ CREATE TABLE taquillas (
     servicio VARCHAR(30),
     telefono VARCHAR(9),
     empresa_externa BOOLEAN,
+	fecha_revision DATETIME NULL,
+	revisado BOOLEAN DEFAULT 0,
     FOREIGN KEY (vestuario_id) REFERENCES vestuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;

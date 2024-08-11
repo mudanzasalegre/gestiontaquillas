@@ -65,6 +65,7 @@
 		<table class="table table-bordered" th:if="${!noResults}">
 			<thead>
 				<tr>
+					<!-- Columnas existentes -->
 					<th>
 						<a
 							th:href="@{/taquillas(sortField='codigoTaquilla', sortDir=${reverseSortDir}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos}, page=0, size=${pageSize})}">
@@ -99,17 +100,41 @@
 					</th>
 					<th>Teléfono</th>
 					<th>Empresa Externa</th>
+					<!-- Nuevas columnas -->
+					<th>
+						<a
+							th:href="@{/taquillas(sortField='fechaRevision', sortDir=${reverseSortDir}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos}, page=0, size=${pageSize})}">
+							Última Revisión
+							<i class="fas"
+								th:classappend="${sortField == 'fechaRevision'} ? (${sortDir == 'asc'} ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up') : 'fa-sort'"></i>
+						</a>
+					</th>
+					<th>
+						<a
+							th:href="@{/taquillas(sortField='revisado', sortDir=${reverseSortDir}, vestuarioId=${vestuarioId}, nombreApellidos=${nombreApellidos}, page=0, size=${pageSize})}">
+							Revisado
+							<i class="fas"
+								th:classappend="${sortField == 'revisado'} ? (${sortDir == 'asc'} ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up') : 'fa-sort'"></i>
+						</a>
+					</th>
 					<th>Acciones</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr th:each="taquilla : ${taquillas}">
+					<!-- Datos existentes -->
 					<td th:text="${taquilla.codigoTaquilla}"></td>
 					<td th:text="${taquilla.nombreApellidos}"></td>
 					<td th:text="${taquilla.categoriaProfesional}"></td>
 					<td th:text="${taquilla.servicio}"></td>
 					<td th:text="${taquilla.telefono}"></td>
 					<td th:text="${taquilla.empresaExterna ? 'Sí' : 'No'}"></td>
+					<!-- Nuevos datos -->
+					<td
+						th:text="${taquilla.fechaRevision != null ? #temporals.format(taquilla.fechaRevision, 'dd/MM/yyyy HH:mm') : 'Sin revisión'}">
+					</td>
+					<td><input type="checkbox" th:checked="${taquilla.revisado}" disabled></td>
+					<!-- Acciones -->
 					<td>
 						<a th:href="@{/taquillas/edit/{id}(id=${taquilla.id})}" class="btn btn-info btn-sm">
 							<i class="fas fa-edit"></i>
@@ -121,6 +146,7 @@
 				</tr>
 			</tbody>
 		</table>
+
 
 		<nav aria-label="Page navigation" th:if="${!noResults}">
 			<ul class="pagination justify-content-center">
